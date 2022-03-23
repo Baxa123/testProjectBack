@@ -1,0 +1,28 @@
+﻿# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP .NET Core service.
+
+version: '3.4'
+
+#create a volume for the my sql container.To ensure Data persists after my sql container is stopped
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3308:3306"
+
+  api:
+     depends_on:
+       - db
+     build:
+       context: .
+       dockerfile: Proj3/Dockerfile
+     ports:
+      - "5000:80"
+     #restart: always
+     environment: 
+       - DBHOST =db
+       - ASPNETCORE_ENVIRONMENT=Development
+
