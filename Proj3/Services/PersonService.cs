@@ -6,7 +6,6 @@ namespace Proj3.Services
     public class PersonService
     {
         public List<Person> getAll() {
-            // получение данных
             using (PersonContext db = new PersonContext())
             {
                 var users = db.Persons
@@ -14,7 +13,6 @@ namespace Proj3.Services
                     .Include(p => p.ServiceNumbers)
                     .Include(p => p.ServiceMobileNumbers)
                     .ToList();
-                Console.WriteLine("Список объектов:");
                 return users;
             }
         }
@@ -38,6 +36,17 @@ namespace Proj3.Services
             }
         }
 
+        internal List<Person> getSelectedStructuralSubdivision(string selectedStructuralSubdivision)
+        {
+            using (PersonContext db = new PersonContext())
+            {
+               return db.Persons.Include(p => p.PersonalNumbers)
+                        .Include(p => p.ServiceNumbers)
+                        .Include(p => p.ServiceMobileNumbers).Where(p => p.StructuralSubdivision == selectedStructuralSubdivision).ToList();
+            }
+
+        }
+
         public void addPerson(Person person)
         {
             using (PersonContext db = new PersonContext())
@@ -47,23 +56,30 @@ namespace Proj3.Services
             }
         }
 
-        public void deletePerson(int id)
+        public void deletePerson(int[] selectedPersons)
         {
             using (PersonContext db = new PersonContext())
             {
-                var person = db.Persons.Include(p => p.PersonalNumbers)
-                    .Include(p => p.ServiceNumbers)
-                    .Include(p => p.ServiceMobileNumbers).SingleOrDefault(p => p.Id == id);
-                db.ServiceNumbers.RemoveRange(person.ServiceNumbers);
-                db.ServiceNumbers.RemoveRange(person.PersonalNumbers);
-                db.ServiceNumbers.RemoveRange(person.ServiceMobileNumbers);
-                db.Persons.Remove(person);
-                db.SaveChanges();
+                for (int i = 0; i < selectedPersons.Length; i++)
+                {
+                    var person = db.Persons.Include(p => p.PersonalNumbers)
+                        .Include(p => p.ServiceNumbers)
+                        .Include(p => p.ServiceMobileNumbers).SingleOrDefault(p => p.Id == selectedPersons[i]);
+                    if (person != null)
+                    {
+                        db.ServiceNumbers.RemoveRange(person.ServiceNumbers);
+                        db.ServiceNumbers.RemoveRange(person.PersonalNumbers);
+                        db.ServiceNumbers.RemoveRange(person.ServiceMobileNumbers);
+                        db.Persons.Remove(person);
+                        db.SaveChanges();
+                    }
+                }
             }
         }
         public bool createUser(Person person) {
             using (PersonContext db = new PersonContext())
             {
+                person.Id = null;
                 db.Persons.Add(person);
                 db.SaveChanges();
             }

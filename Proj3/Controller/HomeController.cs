@@ -16,16 +16,25 @@ namespace Proj3
             return Ok(personService.getAll());
         }
 
+        [HttpGet]
+        public IActionResult ChangeStructuralSubdivision(string selectedStructuralSubdivision) {
+            if (selectedStructuralSubdivision == "-1")
+            {
+                return GetAll();
+            }
+            return Ok(personService.getSelectedStructuralSubdivision(selectedStructuralSubdivision));
+        }
+
        [HttpPut]
         public IActionResult UpdatePerson(int id, [FromBody] Person person) {
             personService.updatePerson(id, person);
             return Ok();
         }
 
-        [HttpDelete]
-        public IActionResult Delete(int id)
+        [HttpPost]
+        public IActionResult Delete([FromBody]int[] selectedPersons)
         {
-            personService.deletePerson(id);
+            personService.deletePerson(selectedPersons);
             return Ok();
         }
 
@@ -34,12 +43,5 @@ namespace Proj3
             personService.createUser(person);
             return Ok();
         }
-
-        public IActionResult Index()
-        {
-            ViewData["text"] = "test";
-            return View();
-        }
-
     }
 }
