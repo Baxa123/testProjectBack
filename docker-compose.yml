@@ -14,15 +14,26 @@ services:
       - "3308:3306"
 
   api:
-     depends_on:
+    depends_on:
        - db
-     build:
-       context: .
-       dockerfile: Proj3/Dockerfile
-     ports:
+    build:
+      context:  {backEnd folder}
+      dockerfile: Proj3/Dockerfile
+    ports:
       - "5000:80"
-     #restart: always
-     environment: 
-       - DBHOST =db
-       - ASPNETCORE_ENVIRONMENT=Development
-
+    restart: always
+    environment: 
+      - DBHOST =db
+      - ASPNETCORE_ENVIRONMENT=Development
+  frontend:
+    depends_on:
+       - api
+    build:
+      context:  {fronEnd folder}
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+      - "49153:49153"
+    volumes:
+      - "/app/node_modules"
+      - ".:/app"
